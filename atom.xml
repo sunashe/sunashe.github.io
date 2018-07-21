@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>sunashe的博客</title>
+  
+  <subtitle>如果我俩角色互换，我会让你看到什么是残忍。</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2018-07-21T14:21:06.998Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>sunashe</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>test-blog</title>
+    <link href="http://yoursite.com/2018/07/21/test-blog/"/>
+    <id>http://yoursite.com/2018/07/21/test-blog/</id>
+    <published>2018-07-21T09:57:11.000Z</published>
+    <updated>2018-07-21T14:21:06.998Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;strong&gt;错误描述&lt;/strong&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;2018-02-11T16:13:08.658843+08:00 18175537 [ERROR] Semi-sync master failed on net_flush() before waiting for slave reply&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2018-02-11T16:13:08.658883+08:00 18175537 [Note] Stop semi-sync binlog_dump to slave (server_id: -2081800210)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+    
+    
+      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
+    
+      <category term="slave" scheme="http://yoursite.com/tags/slave/"/>
+    
+      <category term="replication" scheme="http://yoursite.com/tags/replication/"/>
+    
+  </entry>
+  
+</feed>
