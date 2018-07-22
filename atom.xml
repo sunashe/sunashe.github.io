@@ -5,9 +5,9 @@
   <subtitle>如果我俩角色互换，我会让你看到什么是残忍。</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
-  <updated>2018-07-21T14:21:06.998Z</updated>
-  <id>http://yoursite.com/</id>
+  <link href="http://www.sunashe.top/"/>
+  <updated>2018-07-22T03:27:44.489Z</updated>
+  <id>http://www.sunashe.top/</id>
   
   <author>
     <name>sunashe</name>
@@ -17,26 +17,50 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>test-blog</title>
-    <link href="http://yoursite.com/2018/07/21/test-blog/"/>
-    <id>http://yoursite.com/2018/07/21/test-blog/</id>
-    <published>2018-07-21T09:57:11.000Z</published>
-    <updated>2018-07-21T14:21:06.998Z</updated>
+    <title>test-2</title>
+    <link href="http://www.sunashe.top/2018/07/22/test-2/"/>
+    <id>http://www.sunashe.top/2018/07/22/test-2/</id>
+    <published>2018-07-22T03:25:15.000Z</published>
+    <updated>2018-07-22T03:27:44.489Z</updated>
     
     <summary type="html">
     
-      &lt;p&gt;&lt;strong&gt;错误描述&lt;/strong&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;2018-02-11T16:13:08.658843+08:00 18175537 [ERROR] Semi-sync master failed on net_flush() before waiting for slave reply&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2018-02-11T16:13:08.658883+08:00 18175537 [Note] Stop semi-sync binlog_dump to slave (server_id: -2081800210)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+      
+      
+        &lt;h3 id=&quot;曾经&quot;&gt;&lt;a href=&quot;#曾经&quot; class=&quot;headerlink&quot; title=&quot;曾经&quot;&gt;&lt;/a&gt;曾经&lt;/h3&gt;&lt;h3 id=&quot;后来&quot;&gt;&lt;a href=&quot;#后来&quot; class=&quot;headerlink&quot; title=&quot;后来&quot;&gt;&lt;/a&gt;后来&lt;/h3&gt;&lt;h3 id
+      
     
     </summary>
     
-      <category term="MySQL" scheme="http://yoursite.com/categories/MySQL/"/>
+      <category term="mysql" scheme="http://www.sunashe.top/categories/mysql/"/>
     
     
-      <category term="MySQL" scheme="http://yoursite.com/tags/MySQL/"/>
+      <category term="MySQL" scheme="http://www.sunashe.top/tags/MySQL/"/>
     
-      <category term="slave" scheme="http://yoursite.com/tags/slave/"/>
+  </entry>
+  
+  <entry>
+    <title>test-blog</title>
+    <link href="http://www.sunashe.top/2018/07/21/test-blog/"/>
+    <id>http://www.sunashe.top/2018/07/21/test-blog/</id>
+    <published>2018-07-21T09:57:11.000Z</published>
+    <updated>2018-07-22T03:24:17.934Z</updated>
     
-      <category term="replication" scheme="http://yoursite.com/tags/replication/"/>
+    <summary type="html">
+    
+      &lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;错误描述&lt;/strong&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;2018-02-11T16:13:08.658843+08:00 18175537 [ERROR] Semi-sync master failed on net_flush() before waiting for slave reply&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2018-02-11T16:13:08.658883+08:00 18175537 [Note] Stop semi-sync binlog_dump to slave (server_id: -2081800210)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="MySQL" scheme="http://www.sunashe.top/categories/MySQL/"/>
+    
+    
+      <category term="MySQL" scheme="http://www.sunashe.top/tags/MySQL/"/>
+    
+      <category term="slave" scheme="http://www.sunashe.top/tags/slave/"/>
+    
+      <category term="replication" scheme="http://www.sunashe.top/tags/replication/"/>
     
   </entry>
   
