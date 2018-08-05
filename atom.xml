@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.sunashe.top/"/>
-  <updated>2018-07-22T03:27:44.489Z</updated>
+  <updated>2018-08-05T07:30:37.065Z</updated>
   <id>http://www.sunashe.top/</id>
   
   <author>
@@ -17,39 +17,21 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>test-2</title>
-    <link href="http://www.sunashe.top/2018/07/22/test-2/"/>
-    <id>http://www.sunashe.top/2018/07/22/test-2/</id>
-    <published>2018-07-22T03:25:15.000Z</published>
-    <updated>2018-07-22T03:27:44.489Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;曾经&quot;&gt;&lt;a href=&quot;#曾经&quot; class=&quot;headerlink&quot; title=&quot;曾经&quot;&gt;&lt;/a&gt;曾经&lt;/h3&gt;&lt;h3 id=&quot;后来&quot;&gt;&lt;a href=&quot;#后来&quot; class=&quot;headerlink&quot; title=&quot;后来&quot;&gt;&lt;/a&gt;后来&lt;/h3&gt;&lt;h3 id
-      
-    
-    </summary>
-    
-      <category term="mysql" scheme="http://www.sunashe.top/categories/mysql/"/>
-    
-    
-      <category term="MySQL" scheme="http://www.sunashe.top/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>test-blog</title>
-    <link href="http://www.sunashe.top/2018/07/21/test-blog/"/>
-    <id>http://www.sunashe.top/2018/07/21/test-blog/</id>
+    <title>详解MySQL-5.7多线程复制可能导致主从复制数据不一致的bug</title>
+    <link href="http://www.sunashe.top/2018/07/21/%E8%AF%A6%E8%A7%A3MySQL-5.7.18%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%A4%8D%E5%88%B6%E5%8F%AF%E8%83%BD%E4%BC%9A%E5%AF%BC%E8%87%B4%E4%B8%BB%E4%BB%8E%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%80%E8%87%B4%E7%9A%84bug/"/>
+    <id>http://www.sunashe.top/2018/07/21/详解MySQL-5.7.18多线程复制可能会导致主从数据不一致的bug/</id>
     <published>2018-07-21T09:57:11.000Z</published>
-    <updated>2018-07-22T03:24:17.934Z</updated>
+    <updated>2018-08-05T07:30:37.065Z</updated>
     
     <summary type="html">
     
-      &lt;hr&gt;
-&lt;p&gt;&lt;strong&gt;错误描述&lt;/strong&gt;&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;2018-02-11T16:13:08.658843+08:00 18175537 [ERROR] Semi-sync master failed on net_flush() before waiting for slave reply&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2018-02-11T16:13:08.658883+08:00 18175537 [Note] Stop semi-sync binlog_dump to slave (server_id: -2081800210)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+      &lt;h3 id=&quot;bug概述&quot;&gt;&lt;a href=&quot;#bug概述&quot; class=&quot;headerlink&quot; title=&quot;bug概述&quot;&gt;&lt;/a&gt;&lt;strong&gt;bug概述&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;从MySQL-5.7.19的Release Notes 中可以看到其修复了如下这个bug&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Replication:&lt;br&gt;In certain cases, the master could write to the binary log a last_committed value which was smaller than it should have been. This could cause the slave to execute in parallel transactions which should not have been, leading to inconsistencies or other errors. (Bug #84471, Bug #25379659)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;意思是，在某些场景中，master在记录二进制日志时，某个事务记录的last_commited值比实际应该记录的值要小，这会导致从机在回放时，将本来不应该并行回放的事务，进行并行回放，因此可能会导致数据不一致，或者其他的错误.(bug编号：84471。)&lt;/p&gt;
     
     </summary>
     
@@ -61,6 +43,8 @@
       <category term="slave" scheme="http://www.sunashe.top/tags/slave/"/>
     
       <category term="replication" scheme="http://www.sunashe.top/tags/replication/"/>
+    
+      <category term="bug" scheme="http://www.sunashe.top/tags/bug/"/>
     
   </entry>
   

@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="MySQL,slave,replication," />
+  <meta name="keywords" content="MySQL,slave,replication,bug," />
 
 
 
@@ -88,18 +88,20 @@
 
 
 
-<meta name="description" content="错误描述122018-02-11T16:13:08.658843+08:00 18175537 [ERROR] Semi-sync master failed on net_flush() before waiting for slave reply2018-02-11T16:13:08.658883+08:00 18175537 [Note] Stop semi-sync binlog_dum">
-<meta name="keywords" content="MySQL,slave,replication">
+<meta name="description" content="bug概述从MySQL-5.7.19的Release Notes 中可以看到其修复了如下这个bug   Replication:In certain cases, the master could write to the binary log a last_committed value which was smaller than it should have been. This could">
+<meta name="keywords" content="MySQL,slave,replication,bug">
 <meta property="og:type" content="article">
-<meta property="og:title" content="test-blog">
-<meta property="og:url" content="http://www.sunashe.top/2018/07/21/test-blog/index.html">
+<meta property="og:title" content="详解MySQL-5.7多线程复制可能导致主从复制数据不一致的bug">
+<meta property="og:url" content="http://www.sunashe.top/2018/07/21/详解MySQL-5.7.18多线程复制可能会导致主从数据不一致的bug/index.html">
 <meta property="og:site_name" content="sunashe的博客">
-<meta property="og:description" content="错误描述122018-02-11T16:13:08.658843+08:00 18175537 [ERROR] Semi-sync master failed on net_flush() before waiting for slave reply2018-02-11T16:13:08.658883+08:00 18175537 [Note] Stop semi-sync binlog_dum">
+<meta property="og:description" content="bug概述从MySQL-5.7.19的Release Notes 中可以看到其修复了如下这个bug   Replication:In certain cases, the master could write to the binary log a last_committed value which was smaller than it should have been. This could">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-07-22T03:24:17.934Z">
+<meta property="og:image" content="http://static.zybuluo.com/sun-ashe/dcxj76r5ufrjns8177mu2yh3/image_1cjvfqs2tj6i1okj1q5p6i0jfl9.png">
+<meta property="og:updated_time" content="2018-08-05T07:30:37.065Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="test-blog">
-<meta name="twitter:description" content="错误描述122018-02-11T16:13:08.658843+08:00 18175537 [ERROR] Semi-sync master failed on net_flush() before waiting for slave reply2018-02-11T16:13:08.658883+08:00 18175537 [Note] Stop semi-sync binlog_dum">
+<meta name="twitter:title" content="详解MySQL-5.7多线程复制可能导致主从复制数据不一致的bug">
+<meta name="twitter:description" content="bug概述从MySQL-5.7.19的Release Notes 中可以看到其修复了如下这个bug   Replication:In certain cases, the master could write to the binary log a last_committed value which was smaller than it should have been. This could">
+<meta name="twitter:image" content="http://static.zybuluo.com/sun-ashe/dcxj76r5ufrjns8177mu2yh3/image_1cjvfqs2tj6i1okj1q5p6i0jfl9.png">
 
 
 
@@ -129,13 +131,13 @@
 
 
 
-  <link rel="canonical" href="http://www.sunashe.top/2018/07/21/test-blog/"/>
+  <link rel="canonical" href="http://www.sunashe.top/2018/07/21/详解MySQL-5.7.18多线程复制可能会导致主从数据不一致的bug/"/>
 
 
 
 
 
-  <title>test-blog | sunashe的博客</title>
+  <title>详解MySQL-5.7多线程复制可能导致主从复制数据不一致的bug | sunashe的博客</title>
   
 
 
@@ -336,7 +338,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.sunashe.top/2018/07/21/test-blog/">
+    <link itemprop="mainEntityOfPage" href="http://www.sunashe.top/2018/07/21/详解MySQL-5.7.18多线程复制可能会导致主从数据不一致的bug/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="sunashe">
@@ -353,7 +355,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">test-blog</h1>
+          <h1 class="post-title" itemprop="name headline">详解MySQL-5.7多线程复制可能导致主从复制数据不一致的bug</h1>
         
 
         <div class="post-meta">
@@ -430,15 +432,29 @@
       
 
       
-        <hr>
-<p><strong>错误描述</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2018-02-11T16:13:08.658843+08:00 18175537 [ERROR] Semi-sync master failed on net_flush() before waiting for slave reply</span><br><span class="line">2018-02-11T16:13:08.658883+08:00 18175537 [Note] Stop semi-sync binlog_dump to slave (server_id: -2081800210)</span><br></pre></td></tr></table></figure></p>
+        <h3 id="bug概述"><a href="#bug概述" class="headerlink" title="bug概述"></a><strong>bug概述</strong></h3><p>从MySQL-5.7.19的Release Notes 中可以看到其修复了如下这个bug</p>
+<blockquote>
+<ul>
+<li>Replication:<br>In certain cases, the master could write to the binary log a last_committed value which was smaller than it should have been. This could cause the slave to execute in parallel transactions which should not have been, leading to inconsistencies or other errors. (Bug #84471, Bug #25379659)</li>
+</ul>
+</blockquote>
+<p>意思是，在某些场景中，master在记录二进制日志时，某个事务记录的last_commited值比实际应该记录的值要小，这会导致从机在回放时，将本来不应该并行回放的事务，进行并行回放，因此可能会导致数据不一致，或者其他的错误.(bug编号：84471。)</p>
 <a id="more"></a>
-<p>此错误发生在半同步复制的binlog发送阶段。调用关系如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Thread 32 &quot;mysqld&quot; hit Breakpoint 2, inline_mysql_socket_send (src_file=0x239cc60 &quot;/data/mysql-server-explain_ddl/vio/viosocket.c&quot;, src_line=201, mysql_socket=..., buf=0x7f77a000be50, n=360, flags=64) at /data/mysql-server-explain_ddl/include/mysql/psi/mysql_socket.h:753</span><br><span class="line">753	&#123;</span><br><span class="line">(gdb) bt</span><br><span class="line">#0  inline_mysql_socket_send (src_file=0x239cc60 &quot;/data/mysql-server-explain_ddl/vio/viosocket.c&quot;, src_line=201, mysql_socket=..., buf=0x7f77a000be50, n=360, flags=64) at /data/mysql-server-explain_ddl/include/mysql/psi/mysql_socket.h:753</span><br><span class="line">#1  0x0000000001ed63b1 in vio_write (vio=0x7f77a0009400, buf=0x7f77a000be50 &quot;D&quot;, size=360) at /data/mysql-server-explain_ddl/vio/viosocket.c:201</span><br><span class="line">#2  0x0000000001520ecc in net_write_raw_loop (net=0x7f77a0002298, buf=0x7f77a000be50 &quot;D&quot;, count=360) at /data/mysql-server-explain_ddl/sql/net_serv.cc:500</span><br><span class="line">#3  0x00000000015211f3 in net_write_packet (net=0x7f77a0002298, packet=0x7f77a000be50 &quot;D&quot;, length=360) at /data/mysql-server-explain_ddl/sql/net_serv.cc:639</span><br><span class="line">#4  0x0000000001520791 in net_flush (net=0x7f77a0002298) at /data/mysql-server-explain_ddl/sql/net_serv.cc:222</span><br><span class="line">#5  0x00007f77f05ea95e in ReplSemiSyncMaster::readSlaveReply (this=0x7f77f07f8120 &lt;repl_semisync&gt;, net=0x7f77a0002298, server_id=12713308, event_buf=0x7f77a0011eb0 &quot;&quot;) at /data/mysql-server-explain_ddl/plugin/semisync/semisync_master.cc:1252</span><br><span class="line">#6  0x00007f77f05ec640 in repl_semi_after_send_event (param=0x7f77f0310d40, event_buf=0x7f77a0011eb0 &quot;&quot;, len=34, skipped_log_file=0x7f77f0311602 &quot;mysql-bin.000023&quot;, skipped_log_pos=0) at /data/mysql-server-explain_ddl/plugin/semisync/semisync_master_plugin.cc:221</span><br><span class="line">#7  0x0000000001543870 in Binlog_transmit_delegate::after_send_event (this=0x2d93a60 &lt;delegates_init()::transmit_mem&gt;, thd=0x7f77a0000950, flags=0, packet=0x7f77a0002540, skipped_log_file=0x7f77f0311600 &quot;./mysql-bin.000023&quot;, skipped_log_pos=0) at /data/mysql-server-explain_ddl/sql/rpl_handler.cc:814</span><br><span class="line">#8  0x000000000190efb3 in Binlog_sender::after_send_hook (this=0x7f77f03115d0, log_file=0x7f77f0311600 &quot;./mysql-bin.000023&quot;, log_pos=0) at /data/mysql-server-explain_ddl/sql/rpl_binlog_sender.cc:1202</span><br><span class="line">#9  0x000000000190c4f2 in Binlog_sender::send_events (this=0x7f77f03115d0, log_cache=0x7f77f0311020, end_pos=3380) at /data/mysql-server-explain_ddl/sql/rpl_binlog_sender.cc:475</span><br><span class="line">#10 0x000000000190bd2b in Binlog_sender::send_binlog (this=0x7f77f03115d0, log_cache=0x7f77f0311020, start_pos=123) at /data/mysql-server-explain_ddl/sql/rpl_binlog_sender.cc:317</span><br><span class="line">#11 0x000000000190b8d4 in Binlog_sender::run (this=0x7f77f03115d0) at /data/mysql-server-explain_ddl/sql/rpl_binlog_sender.cc:225</span><br><span class="line">#12 0x0000000001909470 in mysql_binlog_send (thd=0x7f77a0000950, log_ident=0x7f77f0312230 &quot;&quot;, pos=4, slave_gtid_executed=0x7f77f0312000, flags=0) at /data/mysql-server-explain_ddl/sql/rpl_master.cc:412</span><br><span class="line">#13 0x0000000001909307 in com_binlog_dump_gtid (thd=0x7f77a0000950, packet=0x7f77a000be51 &quot;&quot;, packet_length=126) at /data/mysql-server-explain_ddl/sql/rpl_master.cc:396</span><br><span class="line">#14 0x000000000161b15c in dispatch_command (thd=0x7f77a0000950, com_data=0x7f77f0312e00, command=COM_BINLOG_DUMP_GTID) at /data/mysql-server-explain_ddl/sql/sql_parse.cc:1677</span><br><span class="line">#15 0x00000000016194aa in do_command (thd=0x7f77a0000950) at /data/mysql-server-explain_ddl/sql/sql_parse.cc:999</span><br><span class="line">#16 0x000000000175ba57 in handle_connection (arg=0x3d24ed0) at /data/mysql-server-explain_ddl/sql/conn_handler/connection_handler_per_thread.cc:300</span><br><span class="line">#17 0x0000000001e49759 in pfs_spawn_thread (arg=0x3d24f20) at /data/mysql-server-explain_ddl/storage/perfschema/pfs.cc:2188</span><br><span class="line">#18 0x00007f781d8386ba in start_thread (arg=0x7f77f0313700) at pthread_create.c:333</span><br><span class="line">#19 0x00007f781cccd41d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:109</span><br></pre></td></tr></table></figure></p>
-<p>真实原因为调用<code>send</code>函数出错,当dump thread正在进行binlog发送时如果被kill掉，则错误日志会报此错误。</p>
-<p>dump线程发送binlog时，会把binlog放在一段缓冲区，在缓冲区写满时，则会进行一次send操作。<br>或者，如果没有开启半同步复制，会在binlog发送完，进入到等待状态前，进行一次发送，如果开启了半同步，则会在需要从机返回ack的binlog event写入到缓冲区后进行一次send操作，目的是为了保证可以及时的将需要从机返回ack的binlog event及时发送过去。</p>
-<p>如果没有开启半同步复制的调用关系<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Thread 32 &quot;mysqld&quot; hit Breakpoint 2, inline_mysql_socket_send (src_file=0x239cc60 &quot;/data/mysql-server-explain_ddl/vio/viosocket.c&quot;, src_line=201, mysql_socket=..., buf=0x7f77a000be50, n=360, flags=64) at /data/mysql-server-explain_ddl/include/mysql/psi/mysql_socket.h:753</span><br><span class="line">753	&#123;</span><br><span class="line">(gdb) bt</span><br><span class="line">#0  inline_mysql_socket_send (src_file=0x239cc60 &quot;/data/mysql-server-explain_ddl/vio/viosocket.c&quot;, src_line=201, mysql_socket=..., buf=0x7f77a000be50, n=360, flags=64) at /data/mysql-server-explain_ddl/include/mysql/psi/mysql_socket.h:753</span><br><span class="line">#1  0x0000000001ed63b1 in vio_write (vio=0x7f77a0009400, buf=0x7f77a000be50 &quot;D&quot;, size=360) at /data/mysql-server-explain_ddl/vio/viosocket.c:201</span><br><span class="line">#2  0x0000000001520ecc in net_write_raw_loop (net=0x7f77a0002298, buf=0x7f77a000be50 &quot;D&quot;, count=360) at /data/mysql-server-explain_ddl/sql/net_serv.cc:500</span><br><span class="line">#3  0x00000000015211f3 in net_write_packet (net=0x7f77a0002298, packet=0x7f77a000be50 &quot;D&quot;, length=360) at /data/mysql-server-explain_ddl/sql/net_serv.cc:639</span><br><span class="line">#4  0x0000000001520791 in net_flush (net=0x7f77a0002298) at /data/mysql-server-explain_ddl/sql/net_serv.cc:222</span><br><span class="line">#5  0x00000000015394d4 in Protocol_classic::flush_net (this=0x7f77a0001ae8) at /data/mysql-server-explain_ddl/sql/protocol_classic.cc:724</span><br><span class="line">#6  0x000000000190ec7d in Binlog_sender::flush_net (this=0x7f77f03115d0) at /data/mysql-server-explain_ddl/sql/rpl_binlog_sender.cc:1149</span><br><span class="line">#7  0x000000000190e019 in Binlog_sender::get_binlog_end_pos (this=0x7f77f03115d0, log_cache=0x7f77f0311020) at /data/mysql-server-explain_ddl/sql/rpl_binlog_sender.cc:362</span><br><span class="line">#8  0x000000000190bd00 in Binlog_sender::send_binlog (this=0x7f77f03115d0, log_cache=0x7f77f0311020, start_pos=123) at /data/mysql-server-explain_ddl/sql/rpl_binlog_sender.cc:313</span><br><span class="line">#9  0x000000000190b8d4 in Binlog_sender::run (this=0x7f77f03115d0) at /data/mysql-server-explain_ddl/sql/rpl_binlog_sender.cc:225</span><br><span class="line">#10 0x0000000001909470 in mysql_binlog_send (thd=0x7f77a0000950, log_ident=0x7f77f0312230 &quot;&quot;, pos=4, slave_gtid_executed=0x7f77f0312000, flags=0) at /data/mysql-server-explain_ddl/sql/rpl_master.cc:412</span><br><span class="line">#11 0x0000000001909307 in com_binlog_dump_gtid (thd=0x7f77a0000950, packet=0x7f77a000be51 &quot;&quot;, packet_length=126) at /data/mysql-server-explain_ddl/sql/rpl_master.cc:396</span><br><span class="line">#12 0x000000000161b15c in dispatch_command (thd=0x7f77a0000950, com_data=0x7f77f0312e00, command=COM_BINLOG_DUMP_GTID) at /data/mysql-server-explain_ddl/sql/sql_parse.cc:1677</span><br><span class="line">#13 0x00000000016194aa in do_command (thd=0x7f77a0000950) at /data/mysql-server-explain_ddl/sql/sql_parse.cc:999</span><br><span class="line">#14 0x000000000175ba57 in handle_connection (arg=0x3d24ed0) at /data/mysql-server-explain_ddl/sql/conn_handler/connection_handler_per_thread.cc:300</span><br><span class="line">#15 0x0000000001e49759 in pfs_spawn_thread (arg=0x3d24f20) at /data/mysql-server-explain_ddl/storage/perfschema/pfs.cc:2188</span><br><span class="line">#16 0x00007f781d8386ba in start_thread (arg=0x7f77f0313700) at pthread_create.c:333</span><br><span class="line">#17 0x00007f781cccd41d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:109</span><br></pre></td></tr></table></figure></p>
-<p>其实类似的还有如下错误,这种可能是执行stop slave之后，主库发送heartbeat失败</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2018-06-26T17:19:58.737709+08:00 15 [Note] Aborted connection 15 to db: &apos;unconnected&apos; user: &apos;ashe&apos; host: &apos;127.0.0.1&apos; (failed on flush_net())</span><br></pre></td></tr></table></figure>
+<h3 id="bug详述"><a href="#bug详述" class="headerlink" title="bug详述"></a><strong>bug详述</strong></h3><p>关于MySQL5.7基于逻辑时间戳的多线程回放的并行回放原理在此不多做解释。<br>从Release Notes中可以看到bug编号，所以可以到bug系统中查询这个bug的详细反馈信息，链接如下<a href="https://bugs.mysql.com/bug.php?id=84471，但是发现是个私有链接，不能访问。但是详细的信息我们可以在github上找到。可以在mysql-server这个项目中搜索25379659，可以搜到RD进行代码提交时的一些记录，并且可以找到针对这个bug做出了哪些代码上的修复。" target="_blank" rel="noopener">https://bugs.mysql.com/bug.php?id=84471，但是发现是个私有链接，不能访问。但是详细的信息我们可以在github上找到。可以在mysql-server这个项目中搜索25379659，可以搜到RD进行代码提交时的一些记录，并且可以找到针对这个bug做出了哪些代码上的修复。</a><br>如下<br><a href="https://github.com/mysql/mysql-server/commit/da46a8987ac52e3cbb3d4eb6918c822513165bc9" target="_blank" rel="noopener">https://github.com/mysql/mysql-server/commit/da46a8987ac52e3cbb3d4eb6918c822513165bc9</a><br>官方解释如下：</p>
+<blockquote>
+<ul>
+<li>ANALYSIS<br>When committing a transaction, its last_commited is set to the value of<br>max_committed_transaction. max_committed_transaction is the maximum<br>sequence_number of committed transactions. It is maintained just before<br>committing each transaction to engine. If its sequence_number is not<br>SEQ_UNINIT then updates max_committed_transaction accordingly.<br>However, it checked wrong sequence_number(the sequence_number of the<br>leader thread’s transaction instead of the sequence_number of the transaction).<br>That caused that max_committed_transaction was only updated in time for leader<br>thread’s transaction. The update for following transactions were delay to<br>finish_commit() which was after the transaction commited to engine.</li>
+</ul>
+</blockquote>
+<p>意思为，在group commit的commit阶段，commit线程队列的head线程负责整个队列的commit操作，commit操作主要操作为更新全局的max_committed_transaction值，此值会影响新的事务在执行数据写入时获取到的last_commit值，也就是binlog中记录的last_commit值，然而，head线程在进行整个队列的commit操作中的如下代码中，出现了差错，如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> for (THD *head= first ; head ; head = head-&gt;next_to_commit)</span><br><span class="line">  &#123;</span><br><span class="line">    DBUG_PRINT(&quot;debug&quot;, (&quot;Thread ID: %u, commit_error: %d, flags.pending: %s&quot;,</span><br><span class="line">                         head-&gt;thread_id(), head-&gt;commit_error,</span><br><span class="line">                         YESNO(head-&gt;get_transaction()-&gt;m_flags.pending)));</span><br><span class="line">    /*</span><br><span class="line">      If flushing failed, set commit_error for the session, skip the</span><br><span class="line">      transaction and proceed with the next transaction instead. This</span><br><span class="line">      will mark all threads as failed, since the flush failed.</span><br><span class="line"></span><br><span class="line">      If flush succeeded, attach to the session and commit it in the</span><br><span class="line">      enginesbgc_after_enrolling_for_commit_stagebgc_after_enrolling_for_commit_stage.</span><br><span class="line">    */</span><br><span class="line">#ifndef DBUG_OFF</span><br><span class="line">    stage_manager.clear_preempt_status(head);</span><br><span class="line">#endif</span><br><span class="line">    if (thd-&gt;get_transaction()-&gt;sequence_number != SEQ_UNINIT)</span><br><span class="line">      update_max_committed(head);</span><br></pre></td></tr></table></figure></p>
+<p>问题点在<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">if (thd-&gt;get_transaction()-&gt;sequence_number != SEQ_UNINIT)</span><br><span class="line">      update_max_committed(head);</span><br></pre></td></tr></table></figure></p>
+<p>thd是队首（当前）线程，首先检测此线程中事物的sequence_number是否为初始值，如果不是，则需要去执行<code>update_max_committed(head)</code>，用来更新max_committed_transaction，其代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">void MYSQL_BIN_LOG::update_max_committed(THD *thd)</span><br><span class="line">&#123;</span><br><span class="line">  Transaction_ctx *trn_ctx= thd-&gt;get_transaction();</span><br><span class="line">  max_committed_transaction.set_if_greater(trn_ctx-&gt;sequence_number);</span><br><span class="line">  /*</span><br><span class="line">    sequence_number timestamp is unneeded anymore, so it&apos;s cleared off.</span><br><span class="line">  */</span><br><span class="line">  trn_ctx-&gt;sequence_number= SEQ_UNINIT;</span><br><span class="line"></span><br><span class="line">  DBUG_ASSERT(trn_ctx-&gt;last_committed == SEQ_UNINIT ||</span><br><span class="line">              thd-&gt;commit_error == THD::CE_FLUSH_ERROR);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意其中的<code>trn_ctx-&gt;sequence_number= SEQ_UNINIT;</code> 这表明，在第一次for循环过程中，将head线程中的trn_ctx-&gt;sequence_number做了初始化。并且更新了max_committed_transaction,但是在之后的循环中，在处理队列中的其他线程时，依然是拿当前线程在进行判断是否是初始化值，所以并不会去更新max_committed_transaction。而随后会进行存储引擎的提交操作<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">       storage engine commit</span><br><span class="line">      */</span><br><span class="line">     if (ha_commit_low(head, all, false))</span><br></pre></td></tr></table></figure></p>
+<p>这表明在存储引擎层进行提交，释放锁资源，释放undo等操作，行锁用于控制并发，释放行锁后，其他线程如果更新线程队列的非head线程写入的行数据，则其他线程获取到的last_commit值会小于非head线程的sequence_number，这表明对于相同数据行的写入操作在从库上可以并发的去执行，则有可能导致主从数据不一致，或者复制报错。</p>
+<h3 id="官方修复"><a href="#官方修复" class="headerlink" title="官方修复"></a><strong>官方修复</strong></h3><p>起始修复起来非常简单，就是判断每一个线程的sequence_number，而不是当前线程。<br><img src="http://static.zybuluo.com/sun-ashe/dcxj76r5ufrjns8177mu2yh3/image_1cjvfqs2tj6i1okj1q5p6i0jfl9.png" alt="image_1cjvfqs2tj6i1okj1q5p6i0jfl9.png-153.4kB"></p>
+<h3 id="对于线上的影响"><a href="#对于线上的影响" class="headerlink" title="对于线上的影响"></a><strong>对于线上的影响</strong></h3><p>虽然存在这个问题，但是并不一定会带来数据不一致的风险。来假设场景</p>
+<h4 id="先insert-后update场景"><a href="#先insert-后update场景" class="headerlink" title="先insert,后update场景"></a>先insert,后update场景</h4><p>这种情况下，如果因为如上bug，导致update先执行，则复制报错，不会出现数据不一致。</p>
+<h4 id="先update，再update"><a href="#先update，再update" class="headerlink" title="先update，再update"></a>先update，再update</h4><p>这种情况下，复制不会报错，update数据有可能被覆盖。</p>
 
       
     </div>
@@ -473,6 +489,8 @@
           
             <a href="/tags/replication/" rel="tag"><i class="fa fa-tag"></i> replication</a>
           
+            <a href="/tags/bug/" rel="tag"><i class="fa fa-tag"></i> bug</a>
+          
         </div>
       
 
@@ -480,22 +498,6 @@
       
       
 
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/07/22/test-2/" rel="prev" title="test-2">
-                test-2 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
       
 
       
@@ -544,8 +546,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -564,7 +575,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">1</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -575,7 +586,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">1</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -586,7 +597,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -640,6 +651,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#bug概述"><span class="nav-number">1.</span> <span class="nav-text">bug概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bug详述"><span class="nav-number">2.</span> <span class="nav-text">bug详述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#官方修复"><span class="nav-number">3.</span> <span class="nav-text">官方修复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对于线上的影响"><span class="nav-number">4.</span> <span class="nav-text">对于线上的影响</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#先insert-后update场景"><span class="nav-number">4.1.</span> <span class="nav-text">先insert,后update场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#先update，再update"><span class="nav-number">4.2.</span> <span class="nav-text">先update，再update</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
